@@ -21,7 +21,7 @@ public class CustomUserDetails implements UserDetails {
     private final Integer userId;
     private final String  username;
     private final String  password;
-    private final String  role;
+    private final Enum  role;
     private final boolean isActive;
     private final Collection<? extends GrantedAuthority> authorities;
 

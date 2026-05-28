@@ -81,7 +81,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 		<!-- 6. TỰ ĐỘNG SINH CODE LOMBOK (SỬA LỖI GETTER/SETTER ĐỎ) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

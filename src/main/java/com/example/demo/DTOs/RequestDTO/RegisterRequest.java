@@ -1,5 +1,6 @@
 package com.example.demo.DTOs.RequestDTO;
 
+import com.example.demo.Enums.Role;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -25,5 +26,5 @@ public class RegisterRequest {
     private String phoneNumber;
 
     // Mặc định PATIENT nếu không truyền; ADMIN mới được tạo DOCTOR
-    private String role = "PATIENT";
+    private Role role =Role.PATIENT;
 }

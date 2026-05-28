@@ -1,5 +1,9 @@
-package com.example.demo.Security;
+package com.example.demo.Configs;
 
+import com.example.demo.Security.CustomUserDetailsService;
+import com.example.demo.Security.JwtAccessDeniedHandler;
+import com.example.demo.Security.JwtAuthEntryPoint;
+import com.example.demo.Security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,9 +50,9 @@ import java.util.List;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
-    private final JwtAuthenticationFilter  jwtAuthenticationFilter;
-    private final JwtAuthEntryPoint        jwtAuthEntryPoint;
-    private final JwtAccessDeniedHandler   jwtAccessDeniedHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     // ─── Password Encoder ─────────────────────────────────────────────────────
 
