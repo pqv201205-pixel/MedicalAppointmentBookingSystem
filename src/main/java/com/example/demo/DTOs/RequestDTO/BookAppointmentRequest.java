@@ -7,6 +7,14 @@ import java.time.LocalDate;
 @Data
 public class BookAppointmentRequest {
 
+    // 1. Đồng bộ kiểu dữ liệu thành Long (Vì trong Service đang dùng Long cho Patient ID)
+    @NotNull(message = "PatientId không được để trống")
+    private Integer patientId;
+
+    // 2. BỔ SUNG TRƯỜNG NÀY (Bắt buộc phải có để chạy hàm scheduleRepository.findById(request.getScheduleId()))
+    @NotNull(message = "ScheduleId không được để trống")
+    private Integer scheduleId;
+
     @NotNull(message = "DoctorId không được để trống")
     private Integer doctorId;
 

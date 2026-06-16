@@ -13,14 +13,14 @@ public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ReviewId")
-    private Long reviewId;
+    private Integer reviewId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DoctorId", nullable = false)
     private Doctor doctor;
 
     @Column(name = "PatientId", nullable = false)
-    private Long patientId;
+    private Integer patientId;
 
     @Column(name = "Rating", nullable = false)
     private Integer rating; // Số sao từ 1 đến 5

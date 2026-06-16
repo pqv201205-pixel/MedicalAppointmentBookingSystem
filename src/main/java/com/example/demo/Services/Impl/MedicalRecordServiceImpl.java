@@ -1,9 +1,9 @@
 package com.example.demo.Services.Impl;
 
-import com.example.demo.DTOs.MedicalRecordRequest;
+import com.example.demo.DTOs.RequestDTO.MedicalRecordRequest;
 import com.example.demo.Entities.MedicalRecord;
 import com.example.demo.Entities.Appointment;
-import com.example.demo.Entities.AppointmentStatus;
+import com.example.demo.Enums.AppointmentStatus;
 import com.example.demo.Repositories.MedicalRecordRepository;
 import com.example.demo.Repositories.AppointmentRepository;
 
@@ -37,7 +37,7 @@ public class MedicalRecordServiceImpl {
 
         MedicalRecord record = new MedicalRecord();
         record.setAppointment(appointment);
-        record.setPatientId(appointment.getPatientId());
+        record.setPatientId(appointment.getPatient().getPatientId());
         record.setDiagnosis(request.getDiagnosis());
         record.setPrescription(request.getPrescription());
         record.setDoctorNotes(request.getDoctorNotes());
@@ -46,7 +46,7 @@ public class MedicalRecordServiceImpl {
     }
 
     @Transactional
-    public void uploadMedicalDocuments(Long recordId, MultipartFile[] files) {
+    public void uploadMedicalDocuments(Integer recordId, MultipartFile[] files) {
         MedicalRecord record = medicalRecordRepository.findById(recordId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bệnh án"));
 
@@ -73,7 +73,7 @@ public class MedicalRecordServiceImpl {
         medicalRecordRepository.save(record);
     }
 
-    public List<MedicalRecord> getPatientHistory(Long patientId) {
-        return medicalRecordRepository.findByPatientIdOrderByAppointmentScheduleDateDesc(patientId);
+    public List<MedicalRecord> getPatientHistory(Integer patientId) {
+        return medicalRecordRepository.findByAppointment_Patient_PatientIdOrderByAppointment_AppointmentDateDesc(patientId);
     }
 }

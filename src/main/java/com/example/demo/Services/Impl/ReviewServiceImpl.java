@@ -1,9 +1,9 @@
 package com.example.demo.Services.Impl;
 
-import com.example.demo.DTOs.ReviewRequest;
+import com.example.demo.DTOs.RequestDTO.ReviewRequest;
 import com.example.demo.Entities.Review;
 import com.example.demo.Entities.Appointment;
-import com.example.demo.Entities.AppointmentStatus;
+import com.example.demo.Enums.AppointmentStatus;
 import com.example.demo.Repositories.ReviewRepository;
 import com.example.demo.Repositories.AppointmentRepository;
 
@@ -31,8 +31,8 @@ public class ReviewServiceImpl {
         }
 
         Review review = new Review();
-        review.setDoctor(appointment.getSchedule().getDoctor());
-        review.setPatientId(appointment.getPatientId());
+        review.setDoctor(appointment.getDoctor());
+        review.setPatientId(appointment.getPatient().getPatientId());
         review.setRating(request.getRating());
         review.setComment(request.getComment());
         review.setCreatedAt(java.time.LocalDateTime.now());
@@ -40,7 +40,7 @@ public class ReviewServiceImpl {
         reviewRepository.save(review);
     }
 
-    public List<Review> getDoctorReviews(Long doctorId) {
-        return reviewRepository.findByDoctorIdOrderByCreatedAtDesc(doctorId);
+    public List<Review> getDoctorReviews(Integer doctorId) {
+        return reviewRepository.findByDoctor_DoctorIdOrderByCreatedAtDesc(doctorId);
     }
 }

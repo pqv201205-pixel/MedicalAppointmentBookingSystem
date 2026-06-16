@@ -1,4 +1,4 @@
-package com.example.demo.Services;
+package com.example.demo.Services.Impl;
 
 import com.example.demo.DTOs.RequestDTO.*;
 import com.example.demo.DTOs.ResponseDTO.*;
@@ -7,6 +7,9 @@ import com.example.demo.Enums.Role;
 import com.example.demo.Exceptions.*;
 import com.example.demo.Repositories.UserRepository;
 import com.example.demo.Security.JwtTokenProvider;
+import com.example.demo.Services.AuditLogService;
+import com.example.demo.Services.EmailService;
+import com.example.demo.Services.RedisTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,9 +41,9 @@ public class UserServiceImpl {
     private final PasswordEncoder         passwordEncoder;
     private final JwtTokenProvider        jwtTokenProvider;
     private final AuthenticationManager   authenticationManager;
-    private final EmailService            emailService;       // Tính năng 11
-    private final AuditLogService         auditLogService;    // Tính năng 16
-    private final RedisTokenService       redisTokenService;  // Tính năng 18 — cache refresh token
+    private final EmailService emailService;       // Tính năng 11
+    private final AuditLogService auditLogService;    // Tính năng 16
+    private final RedisTokenService redisTokenService;  // Tính năng 18 — cache refresh token
 
     // ─────────────────────────────────────────────
     // 1.1 ĐĂNG KÝ
@@ -210,7 +213,7 @@ public class UserServiceImpl {
         redisTokenService.saveOtp(user.getUserId(), otp);
 
         // Gửi email chứa OTP — tính năng 11
-        emailService.sendPasswordResetOtp(user.getEmail(), user.getUsername(), otp);
+        emailService.sendOtpEmail(user.getEmail(), otp);
 
         auditLogService.log(user.getUserId(), "FORGOT_PASSWORD", "Gửi OTP về email " + email);
         log.info("Đã gửi OTP reset mật khẩu tới email={}", email);

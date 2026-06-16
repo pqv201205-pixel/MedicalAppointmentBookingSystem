@@ -1,8 +1,8 @@
 package com.example.demo.Services.Impl;
 
+import com.example.demo.Enums.AppointmentStatus;
 import com.example.demo.Repositories.AppointmentRepository;
 import com.example.demo.Repositories.DoctorRepository;
-import com.example.demo.Entities.AppointmentStatus;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

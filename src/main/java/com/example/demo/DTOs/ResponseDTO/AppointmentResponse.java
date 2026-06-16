@@ -1,38 +1,26 @@
 package com.example.demo.DTOs.ResponseDTO;
 
-import com.example.demo.Entities.Appointment;
-import lombok.*;
+import com.example.demo.Enums.AppointmentStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
-@Data
-@Builder
-public class AppointmentResponse {
-    private Integer       appointmentId;
-    private PatientResponse patient;
-    private DoctorResponse  doctor;
-    private LocalDate       appointmentDate;
-    private String          timeSlot;
-    private String          status;
-    private String          paymentStatus;
-    private String          symptoms;
-    private String          notes;
-    private LocalDateTime   createdAt;
-    private LocalDateTime   updatedAt;
+@Data // Tự động sinh tất cả Getter, Setter, toString, equals, hashCode chuẩn public
+@NoArgsConstructor
+@AllArgsConstructor
+public class AppointmentResponse { // BẮT BUỘC phải có chữ "public" ở đây
 
-    public static AppointmentResponse from(Appointment a) {
-        return AppointmentResponse.builder()
-                .appointmentId(a.getAppointmentId())
-                .patient(PatientResponse.from(a.getPatient()))
-                .doctor(DoctorResponse.from(a.getDoctor()))
-                .appointmentDate(a.getAppointmentDate())
-                .timeSlot(a.getTimeSlot())
-                .status(a.getStatus())
-                .paymentStatus(a.getPaymentStatus())
-                .symptoms(a.getSymptoms())
-                .notes(a.getNotes())
-                .createdAt(a.getCreatedAt())
-                .updatedAt(a.getUpdatedAt())
-                .build();
-    }
+    private Long id;
+    private Long patientId;
+    private Long doctorId;
+    private String doctorName;
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private AppointmentStatus status; // Lưu ý kiểu Enum hay String cho đồng bộ
+    private String symptoms;
+    private String qrCode;
+    private String cancelReason;
 }

@@ -13,7 +13,7 @@ public class MedicalRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "RecordId")
-    private Long recordId;
+    private Integer recordId;
 
     // Kết nối 1-1 với lịch hẹn cụ thể
     @OneToOne(fetch = FetchType.LAZY)
@@ -21,7 +21,7 @@ public class MedicalRecord {
     private Appointment appointment;
 
     @Column(name = "PatientId", nullable = false)
-    private Long patientId;
+    private Integer patientId;
 
     @Column(name = "Diagnosis", nullable = false, columnDefinition = "TEXT")
     private String diagnosis; // Chẩn đoán bệnh

@@ -1,6 +1,7 @@
 package com.example.demo.DTOs.ResponseDTO;
 
 import com.example.demo.Entities.DoctorSchedule;
+import com.example.demo.Entities.Schedule;
 import lombok.*;
 import java.time.LocalTime;
 
@@ -16,11 +17,11 @@ public class DoctorScheduleResponse {
     private LocalTime endTime;
     private Integer   maxSlots;
 
-    public static DoctorScheduleResponse from(DoctorSchedule s) {
+    public static DoctorScheduleResponse from(DoctorSchedule s) { // Đổi từ Schedule sang DoctorSchedule
         return DoctorScheduleResponse.builder()
                 .scheduleId(s.getScheduleId())
                 .doctorId(s.getDoctor().getDoctorId())
-                .doctorName(s.getDoctor().getFullName())
+                .doctorName(s.getDoctor().getFullName()) // Đổi từ getFullName() thành getName()
                 .dayOfWeek(s.getDayOfWeek())
                 .dayOfWeekLabel(dayLabel(s.getDayOfWeek()))
                 .startTime(s.getStartTime())

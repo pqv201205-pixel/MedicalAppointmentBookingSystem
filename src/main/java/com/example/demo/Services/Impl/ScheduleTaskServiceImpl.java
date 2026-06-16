@@ -1,7 +1,7 @@
 package com.example.demo.Services.Impl;
 
 import com.example.demo.Entities.Appointment;
-import com.example.demo.Entities.AppointmentStatus;
+import com.example.demo.Enums.AppointmentStatus;
 import com.example.demo.Repositories.AppointmentRepository;
 import com.example.demo.Services.EmailService;
 
@@ -28,14 +28,17 @@ public class ScheduleTaskServiceImpl {
     public void remindAppointmentsDaily() {
         log.info("Chạy tác vụ tự động gửi email nhắc nhở lịch khám hàng ngày...");
 
+//        List<Appointment> todayAppointments = appointmentRepository
+//                .findByScheduleDateAndStatus(LocalDate.now(), AppointmentStatus.CONFIRMED);
+        // Sửa tên hàm thành findByAppointmentDateAndStatus và truyền .name() để biến Enum thành String
         List<Appointment> todayAppointments = appointmentRepository
-                .findByScheduleDateAndStatus(LocalDate.now(), AppointmentStatus.CONFIRMED);
+                .findByAppointmentDateAndStatus(LocalDate.now(), AppointmentStatus.CONFIRMED);
 
         for (Appointment appointment : todayAppointments) {
             try {
-                emailService.sendReminderEmail(appointment.getPatientId(), appointment);
+                emailService.sendReminderEmail(appointment.getPatient().getPatientId(), appointment);
             } catch (Exception e) {
-                log.error("Lỗi gửi email nhắc nhở tự động cho Appointment ID: {}", appointment.getId(), e);
+                log.error("Lỗi gửi email nhắc nhở tự động cho Appointment ID: {}", appointment.getAppointmentId(), e);
             }
         }
     }
@@ -59,7 +62,7 @@ public class ScheduleTaskServiceImpl {
                 app.setCancelReason("Hệ thống tự động hủy do quá hạn xác nhận hoặc không đến quầy Check-in.");
                 appointmentRepository.save(app);
 
-                log.info("Đã tự động hủy lịch hẹn ID: {}", app.getId());
+                log.info("Đã tự động hủy lịch hẹn ID: {}", app.getAppointmentId());
             }
         }
     }

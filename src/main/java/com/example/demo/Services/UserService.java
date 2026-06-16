@@ -210,7 +210,7 @@ public class UserService {
         redisTokenService.saveOtp(user.getUserId(), otp);
 
         // Gửi email chứa OTP — tính năng 11
-        emailService.sendPasswordResetOtp(user.getEmail(), user.getUsername(), otp);
+        emailService.sendOtpEmail(user.getEmail(),  otp);
 
         auditLogService.log(user.getUserId(), "FORGOT_PASSWORD", "Gửi OTP về email " + email);
         log.info("Đã gửi OTP reset mật khẩu tới email={}", email);

@@ -1,6 +1,7 @@
 package com.example.demo.DTOs.ResponseDTO;
 
 import com.example.demo.Entities.User;
+import com.example.demo.Enums.Role;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -11,7 +12,7 @@ public class UserResponse {
     private String        username;
     private String        email;
     private String        phoneNumber;
-    private String        role;
+    private Role role;
     private Boolean       isActive;
     private LocalDateTime createdAt;
 
