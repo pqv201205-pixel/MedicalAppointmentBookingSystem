@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f9fafb;
+    color: #111827;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-blue-600 text-white px-4 py-2 rounded-lg font-medium
+           hover:bg-blue-700 active:scale-95 transition-all duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply bg-white text-gray-700 px-4 py-2 rounded-lg font-medium
+           border border-gray-200 hover:bg-gray-50 active:scale-95
+           transition-all duration-150;
+  }
+  .btn-danger {
+    @apply bg-red-500 text-white px-4 py-2 rounded-lg font-medium
+           hover:bg-red-600 active:scale-95 transition-all duration-150;
+  }
+  .input {
+    @apply w-full px-3 py-2 border border-gray-200 rounded-lg text-sm
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+           placeholder:text-gray-400 bg-white transition-all duration-150;
+  }
+  .card {
+    @apply bg-white rounded-xl border border-gray-100 shadow-sm;
+  }
+
+  /* Status badges */
+  .badge-pending   { @apply bg-yellow-100 text-yellow-700 text-xs font-medium px-2.5 py-0.5 rounded-full; }
+  .badge-confirmed { @apply bg-blue-100   text-blue-700   text-xs font-medium px-2.5 py-0.5 rounded-full; }
+  .badge-checkin   { @apply bg-purple-100 text-purple-700 text-xs font-medium px-2.5 py-0.5 rounded-full; }
+  .badge-completed { @apply bg-green-100  text-green-700  text-xs font-medium px-2.5 py-0.5 rounded-full; }
+  .badge-cancelled { @apply bg-red-100    text-red-700    text-xs font-medium px-2.5 py-0.5 rounded-full; }
+  .badge-noshow    { @apply bg-gray-100   text-gray-600   text-xs font-medium px-2.5 py-0.5 rounded-full; }
+}
