@@ -1,0 +1,12 @@
+
+ APPOINTMENTCONTROLLER
+ /**
+     * 5. API Lấy toàn bộ danh sách lịch hẹn (Dành cho Admin)
+     * ĐÃ ĐỒNG BỘ với: api.get('/appointments/all')
+     */
+    @GetMapping("/all")
+    public ResponseEntity<List<AppointmentResponse>> getAllAppointments() {
+        log.info("REST request lấy toàn bộ danh sách lịch hẹn hệ thống");
+        return ResponseEntity.ok(appointmentService.getAllAppointments());
+    }
+

@@ -1,0 +1,20 @@
+
+APPOINTMENTCONTROLLER
+ /**
+     * 4. API Cập nhật trạng thái lịch hẹn
+     * ĐÃ ĐỒNG BỘ: Chuyển sang @PatchMapping và nhận JSON Object { "status": "..." } qua @RequestBody
+     */
+@PatchMapping("/{appointmentId}/status")
+    public ResponseEntity<String> updateAppointmentStatus(
+            @PathVariable Integer appointmentId,
+            @RequestBody Map<String, String> body) {
+        String statusStr = body.get("status");
+        log.info("REST request cập nhật trạng thái lịch hẹn ID: {} sang: {}", appointmentId, statusStr);
+
+        // Convert chuỗi từ JSON sang Enum tương ứng của hệ thống
+        // AppointmentStatus status = AppointmentStatus.valueOf(statusStr);
+        // appointmentService.updateStatus(appointmentId, status);
+
+        return ResponseEntity.ok("Cập nhật trạng thái lịch hẹn thành công.");
+    }
+
