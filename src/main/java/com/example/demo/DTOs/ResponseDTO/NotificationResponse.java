@@ -3,7 +3,8 @@ package com.example.demo.DTOs.ResponseDTO;
 import com.example.demo.Entities.Notification;
 import lombok.*;
 import java.time.LocalDateTime;
-
+@NoArgsConstructor  // <--- THÊM DÒNG NÀY ĐỂ MỞ PUBLIC CONSTRUCTOR RỖNG
+@AllArgsConstructor
 @Data
 @Builder
 public class NotificationResponse {

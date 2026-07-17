@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
-    private final ScheduleRepository scheduleRepository; // Đã đổi tên repo cho đồng bộ
+    private final ScheduleRepository scheduleRepository;
     private final ScheduleService scheduleService;
     private final EmailService emailService;
     private final QrCodeService qrCodeService;
@@ -56,7 +57,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         // 3. Khởi tạo đối tượng lịch hẹn mới
         Appointment appointment = new Appointment();
-        // Giả lập map tạm thời ID (Nếu repository yêu cầu object Patient, bạn cần findById Patient trước)
         appointment.setAppointmentDate(request.getAppointmentDate());
         appointment.setTimeSlot(request.getTimeSlot());
         appointment.setDoctor(requestedSchedule.getDoctor());
@@ -65,10 +65,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setNotes(request.getNotes());
         appointment.setStatus(AppointmentStatus.PENDING);
 
-        // Lưu bước đầu lấy ID tự tăng (Integer)
+        // Lưu bước đầu lấy ID tự tăng
         appointment = appointmentRepository.save(appointment);
 
-        // 4. Sinh mã QR (Ép kiểu từ Integer sang Long nếu hàm QR dùng Long, hoặc sửa hàm QR dùng Integer)
+        // 4. Sinh mã QR
         try {
             String qrCodePath = qrCodeService.generateAppointmentQrCode(appointment.getAppointmentId());
             appointment.setQrCode(qrCodePath);
@@ -89,7 +89,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public AppointmentResponse updateStatus(Integer appointmentId, AppointmentStatus status) { // Đổi sang Integer
+    public AppointmentResponse updateStatus(Integer appointmentId, AppointmentStatus status) {
         log.info("Cập nhật trạng thái lịch hẹn ID {} thành: {}", appointmentId, status);
 
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -103,7 +103,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public AppointmentResponse cancelAppointment(Integer appointmentId, String reason) { // Đổi sang Integer
+    public AppointmentResponse cancelAppointment(Integer appointmentId, String reason) {
         log.warn("Yêu cầu hủy lịch hẹn ID: {}, lý do: {}", appointmentId, reason);
 
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -131,33 +131,103 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AppointmentResponse> getPatientAppointments(Integer patientId) { // Đổi sang Integer
+    public List<AppointmentResponse> getPatientAppointments(Integer patientId) {
         List<Appointment> appointments = appointmentRepository.findByPatient_PatientIdOrderByAppointmentDateDesc(patientId);
         return appointments.stream().map(this::convertToResponse).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<AppointmentResponse> getDoctorAppointments(Integer doctorId) { // Đổi sang Integer
+    public List<AppointmentResponse> getDoctorAppointments(Integer doctorId) {
         List<Appointment> appointments = appointmentRepository.findByDoctor_DoctorIdAndAppointmentDate(doctorId, LocalDate.now());
         return appointments.stream().map(this::convertToResponse).collect(Collectors.toList());
     }
 
-    private AppointmentResponse convertToResponse(Appointment appointment) {
-        AppointmentResponse res = new AppointmentResponse();
-        res.setId(Long.valueOf(appointment.getAppointmentId()));
-        if (appointment.getPatient() != null) {
-            res.setPatientId(Long.valueOf(appointment.getPatient().getPatientId()));
+    @Override
+    @Transactional(readOnly = true)
+    public AppointmentResponse getById(Integer id) {
+        log.info("Đang truy vấn chi tiết lịch hẹn ID: {}", id);
+
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy lịch hẹn với ID: " + id));
+
+        return convertToResponse(appointment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AppointmentResponse> getAllAppointments() {
+        log.info("Admin đang truy vấn toàn bộ danh sách lịch hẹn trong hệ thống");
+
+        List<Appointment> appointments = appointmentRepository.findAll();
+        return appointments.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Helper Method: Ánh xạ dữ liệu sạch từ Entity sang DTO cho Frontend.
+     * Đã được gom gọn các trường từ cả 2 phiên bản cũ của bạn (bao gồm QR code, Giờ khám, Lý do hủy).
+     */
+    private AppointmentResponse convertToResponse(Appointment entity) {
+        AppointmentResponse dto = new AppointmentResponse();
+
+        // 1. Ánh xạ thông tin cơ bản của lịch hẹn (Ép kiểu ID từ Integer sang Long)
+        if (entity.getAppointmentId() != null) {
+            dto.setId(Long.valueOf(entity.getAppointmentId()));
         }
-        res.setDoctorId(Long.valueOf(appointment.getDoctor().getDoctorId()));
-        res.setDoctorName(appointment.getDoctor().getFullName());
-        res.setDate(appointment.getAppointmentDate());
-        res.setStartTime(appointment.getSchedule().getStartTime());
-        res.setEndTime(appointment.getSchedule().getEndTime());
-        res.setStatus(appointment.getStatus());
-        res.setSymptoms(appointment.getSymptoms());
-        res.setQrCode(appointment.getQrCode());
-        res.setCancelReason(appointment.getCancelReason());
-        return res;
+        dto.setDate(entity.getAppointmentDate());
+        dto.setStatus(entity.getStatus()); // Giữ nguyên kiểu Enum AppointmentStatus cho đồng bộ
+        dto.setSymptoms(entity.getSymptoms());
+        dto.setQrCode(entity.getQrCode());
+        dto.setCancelReason(entity.getCancelReason());
+
+        // 2. Lấy thêm thông tin thời gian từ khung giờ làm việc của Bác sĩ (Schedule)
+        if (entity.getSchedule() != null) {
+            dto.setStartTime(entity.getSchedule().getStartTime());
+            dto.setEndTime(entity.getSchedule().getEndTime());
+        }
+
+        // 3. Ánh xạ thông tin Bác sĩ (Ép kiểu ID sang Long)
+        if (entity.getDoctor() != null) {
+            if (entity.getDoctor().getDoctorId() != null) {
+                dto.setDoctorId(Long.valueOf(entity.getDoctor().getDoctorId()));
+            }
+            dto.setDoctorName(entity.getDoctor().getFullName());
+        }
+
+        // 4. Ánh xạ thông tin Bệnh nhân (Ép kiểu ID sang Long)
+        if (entity.getPatient() != null) {
+            if (entity.getPatient().getPatientId() != null) {
+                dto.setPatientId(Long.valueOf(entity.getPatient().getPatientId()));
+            }
+            // Trường patientName không có trong AppointmentResponse của bạn nên bỏ qua
+        }
+
+        return dto;
+    }
+
+    @Override
+    public List<AppointmentResponse> getUpcomingAppointments(Integer patientId) {
+        // Tìm các lịch hẹn có trạng thái PENDING hoặc CONFIRMED sắp diễn ra
+        List<AppointmentStatus> activeStatuses = Arrays.asList(AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED);
+
+        // Sử dụng hàm có sẵn trong Repository của bạn:
+        List<Appointment> appointments = appointmentRepository
+                .findByPatient_PatientIdAndStatusInOrderByAppointmentDateDesc(patientId, activeStatuses);
+
+        // Convert List<Appointment> sang List<AppointmentResponse> và trả về
+        return appointments.stream().map(this::convertToResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AppointmentResponse> getAppointmentHistory(Integer patientId) {
+        // Tìm các lịch hẹn có trạng thái COMPLETED hoặc CANCELLED
+        List<AppointmentStatus> historyStatuses = Arrays.asList(AppointmentStatus.COMPLETED, AppointmentStatus.CANCELLED);
+
+        List<Appointment> appointments = appointmentRepository
+                .findByPatient_PatientIdAndStatusInOrderByAppointmentDateDesc(patientId, historyStatuses);
+
+        return appointments.stream().map(this::convertToResponse).collect(Collectors.toList());
     }
 }

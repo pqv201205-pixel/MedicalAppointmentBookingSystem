@@ -34,9 +34,13 @@ public class DoctorSchedule {
     private LocalTime endTime; // Giờ kết thúc ca khám
 
     @Column(name = "MaxSlots", nullable = false)
-    private Integer maxSlots; // Số lượng bệnh nhân tối đa trong khung giờ này
+    private Integer maxSlots;
 
-    // Mối quan hệ một lịch trình cấu hình có thể có nhiều lịch hẹn thực tế gán vào
+    // THAY ĐỔI ĐOẠN NÀY: Một cấu hình lịch tuần sẽ sinh ra nhiều ngày trực thực tế trong bảng cụ thể
     @OneToMany(mappedBy = "doctorSchedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Appointment> appointments;
+    private List<Schedule> schedules;
+
+//    // Mối quan hệ một lịch trình cấu hình có thể có nhiều lịch hẹn thực tế gán vào
+//    @OneToMany(mappedBy = "doctorSchedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<Appointment> appointments;
 }

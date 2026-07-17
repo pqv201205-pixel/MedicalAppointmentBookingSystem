@@ -1,10 +1,14 @@
 package com.example.demo.Repositories;
 
-
+import com.example.demo.Entities.Appointment;
 import com.example.demo.Entities.Patient;
+import com.example.demo.Enums.AppointmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,4 +20,5 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
     // Thống kê tổng số bệnh nhân phục vụ Dashboard Quản trị
     @Query("SELECT COUNT(p) FROM Patient p")
     long countTotalPatients();
+
 }

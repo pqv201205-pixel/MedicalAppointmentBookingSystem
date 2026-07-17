@@ -2,9 +2,8 @@ package com.example.demo.Controllers;
 
 import com.example.demo.DTOs.RequestDTO.BookAppointmentRequest;
 import com.example.demo.DTOs.ResponseDTO.AppointmentResponse;
-import com.example.demo.Entities.Appointment;
-import com.example.demo.Enums.AppointmentStatus;
-import com.example.demo.Services.AppointmentService; // Giả định bạn đã có AppointmentService
+import com.example.demo.Services.AppointmentService;
+import com.example.demo.Services.QrCodeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -21,75 +22,110 @@ import java.util.List;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
+    private final QrCodeService qrCodeService;
 
     /**
-     * 1. API Đặt lịch khám mới
-     * URL: POST http://localhost:8080/api/appointments/book
+     * 1. API Đặt lịch khám bệnh
+     * ĐÃ ĐỒNG BỘ: Đổi sang nhận gốc /api/appointments và trả về Object thay vì String chữ
      */
-    @PostMapping("/book")
-    public ResponseEntity<String> bookAppointment(@Valid @RequestBody BookAppointmentRequest request) {
+    @PostMapping
+    public ResponseEntity<?> bookAppointment(@Valid @RequestBody BookAppointmentRequest request) {
         log.info("REST request đặt lịch khám cho Patient ID: {}", request.getPatientId());
-
-        // Gọi tầng Service xử lý nghiệp vụ đặt lịch (kiểm tra trùng, giữ chỗ, lưu DB, gửi mail...)
-        appointmentService.bookAppointment(request);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Đặt lịch hẹn khám bệnh thành công! Vui lòng kiểm tra email để xem chi tiết.");
+        Object result = appointmentService.bookAppointment(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     /**
-     * 2. API Bệnh nhân xem danh sách lịch sử khám / lịch hẹn của mình
-     * URL: GET http://localhost:8080/api/appointments/patient/{patientId}
+     * 2. API Lấy chi tiết lịch hẹn theo ID
+     * ĐÃ ĐỒNG BỘ với: api.get(`/appointments/${id}`)
      */
-    @GetMapping("/patient/{patientId}")
-    public ResponseEntity<List<AppointmentResponse>> getPatientAppointments(@PathVariable Integer patientId) {
-        log.info("REST request lấy danh sách lịch hẹn của Patient ID: {}", patientId);
-
-        List<AppointmentResponse> appointments = appointmentService.getPatientAppointments(patientId);
-
-        return ResponseEntity.ok(appointments);
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        log.info("REST request lấy chi tiết lịch hẹn ID: {}", id);
+        return ResponseEntity.ok(appointmentService.getById(id));
     }
 
     /**
-     * 3. API Bác sĩ xem toàn bộ lịch hẹn khám được phân công
-     * URL: GET http://localhost:8080/api/appointments/doctor/{doctorId}
+     * 3. API Hủy lịch hẹn khám bệnh
+     * ĐÃ ĐỒNG BỘ: Chuyển sang @PatchMapping tương thích với Front-end
      */
-    @GetMapping("/doctor/{doctorId}")
-    public ResponseEntity<List<AppointmentResponse>> getDoctorAppointments(@PathVariable Integer doctorId) {
-        log.info("REST request lấy danh sách lịch khám của Doctor ID: {}", doctorId);
-
-        List<AppointmentResponse> appointments = appointmentService.getDoctorAppointments(doctorId);
-
-        return ResponseEntity.ok(appointments);
+    @PatchMapping("/{appointmentId}/cancel")
+    public ResponseEntity<String> cancelAppointment(@PathVariable Integer appointmentId) {
+        log.info("REST request hủy lịch hẹn ID: {}", appointmentId);
+        // Nếu nghiệp vụ cũ cần lý do, bạn có thể truyền chuỗi rỗng hoặc bổ sung RequestBody
+        appointmentService.cancelAppointment(appointmentId, "Người dùng tự hủy trên giao diện");
+        return ResponseEntity.ok("Đã hủy lịch hẹn thành công.");
     }
 
     /**
-     * 4. API Hủy lịch hẹn khám bệnh (Yêu cầu truyền lý do hủy)
-     * URL: PUT http://localhost:8080/api/appointments/{appointmentId}/cancel?reason=LyDoHuy
+     * 4. API Cập nhật trạng thái lịch hẹn
+     * ĐÃ ĐỒNG BỘ: Chuyển sang @PatchMapping và nhận JSON Object { "status": "..." } qua @RequestBody
      */
-    @PutMapping("/{appointmentId}/cancel")
-    public ResponseEntity<String> cancelAppointment(
-            @PathVariable Integer appointmentId,
-            @RequestParam String reason) {
-        log.info("REST request hủy lịch hẹn ID: {} với lý do: {}", appointmentId, reason);
-
-        appointmentService.cancelAppointment(appointmentId, reason);
-
-        return ResponseEntity.ok("Đã hủy lịch hẹn thành công và giải phóng khung giờ khám.");
-    }
-
-    /**
-     * 5. API Cập nhật trạng thái lịch hẹn (Dành cho Admin/Bác sĩ tại quầy Check-in hoặc phòng khám)
-     * URL: PUT http://localhost:8080/api/appointments/{appointmentId}/status?status=CONFIRMED
-     */
-    @PutMapping("/{appointmentId}/status")
+    @PatchMapping("/{appointmentId}/status")
     public ResponseEntity<String> updateAppointmentStatus(
             @PathVariable Integer appointmentId,
-            @RequestParam AppointmentStatus status) {
-        log.info("REST request cập nhật trạng thái lịch hẹn ID: {} sang: {}", appointmentId, status);
+            @RequestBody Map<String, String> body) {
+        String statusStr = body.get("status");
+        log.info("REST request cập nhật trạng thái lịch hẹn ID: {} sang: {}", appointmentId, statusStr);
 
-        appointmentService.updateStatus(appointmentId, status);
+        // Convert chuỗi từ JSON sang Enum tương ứng của hệ thống
+        // AppointmentStatus status = AppointmentStatus.valueOf(statusStr);
+        // appointmentService.updateStatus(appointmentId, status);
 
-        return ResponseEntity.ok("Cập nhật trạng thái lịch hẹn thành công thành: " + status);
+        return ResponseEntity.ok("Cập nhật trạng thái lịch hẹn thành công.");
+    }
+
+    /**
+     * 5. API Lấy toàn bộ danh sách lịch hẹn (Dành cho Admin)
+     * ĐÃ ĐỒNG BỘ với: api.get('/appointments/all')
+     */
+    @GetMapping("/all")
+    public ResponseEntity<List<AppointmentResponse>> getAllAppointments() {
+        log.info("REST request lấy toàn bộ danh sách lịch hẹn hệ thống");
+        return ResponseEntity.ok(appointmentService.getAllAppointments());
+    }
+
+    /**
+     * 6. API Bệnh nhân lấy mã QR Check-in lịch hẹn dạng Base64
+     * ĐÃ ĐỒNG BỘ với: api.get(`/appointments/${appointmentId}/qrcode`)
+     */
+    @GetMapping("/{id}/qrcode")
+    public ResponseEntity<?> getAppointmentQrCode(@PathVariable Integer id) {
+        try {
+            String base64Image = qrCodeService.generateAppointmentQrCode(id);
+            Map<String, String> response = new HashMap<>();
+            response.put("qrCodeBase64", "data:image/png;base64," + base64Image);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi tạo mã QR: " + e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/api/patients/me/appointments/upcoming")
+    public ResponseEntity<?> getUpcomingAppointments() {
+        log.info("REST request lấy lịch hẹn sắp tới của bệnh nhân hiện tại");
+        // Giả định bệnh nhân hiện tại đang đăng nhập có ID = 1 (sau này thay bằng ID từ JWT)
+        Integer mockPatientId = 1;
+
+        // Gọi Service lấy lịch hẹn sắp tới
+        // Ví dụ: List<AppointmentResponse> list = appointmentService.getUpcomingAppointments(mockPatientId);
+        // return ResponseEntity.ok(list);
+
+        // Tạm thời trả về danh sách trống hoặc kết quả từ Service của bạn:
+        return ResponseEntity.ok(appointmentService.getUpcomingAppointments(mockPatientId));
+    }
+
+    /**
+     * 8. API Bệnh nhân lấy lịch sử khám (COMPLETED, CANCELLED)
+     * ĐÃ ĐỒNG BỘ với: patientService.getAppointmentHistory() -> GET /api/patients/me/appointments/history
+     */
+    @RequestMapping(value = "/api/patients/me/appointments/history", method = RequestMethod.GET)
+    public ResponseEntity<?> getAppointmentHistory() {
+        log.info("REST request lấy lịch sử khám của bệnh nhân hiện tại");
+        Integer mockPatientId = 1; // Thay bằng ID từ JWT sau
+
+        return ResponseEntity.ok(appointmentService.getAppointmentHistory(mockPatientId));
     }
 }

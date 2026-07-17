@@ -48,14 +48,14 @@ public class SpecializationServiceImpl implements SpecializationService {
     @Override
     @Transactional
     @CacheEvict(value = "specializations", allEntries = true)
-    public SpecializationResponse updateSpecialization(Long id, SpecializationRequest request) {
+    public SpecializationResponse updateSpecialization(Integer id, SpecializationRequest request) {
         log.info("Đang cập nhật chuyên khoa có ID: {}", id);
 
         Specialization specialization = specializationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chuyên khoa với ID: " + id));
 
         // Kiểm tra trùng tên với các chuyên khoa khác (trừ chính nó)
-        if (specializationRepository.existsByNameAndIdNot(request.getName(), id)) {
+        if (specializationRepository.existsByNameAndSpecializationIdNot(request.getName(), id)) {
             throw new BadRequestException("Tên chuyên khoa '" + request.getName() + "' đã được sử dụng.");
         }
 
@@ -69,7 +69,7 @@ public class SpecializationServiceImpl implements SpecializationService {
     @Override
     @Transactional
     @CacheEvict(value = "specializations", allEntries = true)
-    public void deleteSpecialization(Long id) {
+    public void deleteSpecialization(Integer id) {
         log.warn("Đang tiến hành xóa chuyên khoa có ID: {}", id);
 
         Specialization specialization = specializationRepository.findById(id)
@@ -98,7 +98,7 @@ public class SpecializationServiceImpl implements SpecializationService {
 
     @Override
     @Transactional(readOnly = true)
-    public SpecializationResponse getSpecializationById(Long id) {
+    public SpecializationResponse getSpecializationById(Integer id) {
         Specialization specialization = specializationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chuyên khoa với ID: " + id));
         return convertToResponse(specialization);

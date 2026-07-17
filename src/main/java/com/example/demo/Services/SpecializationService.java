@@ -9,11 +9,11 @@ public interface SpecializationService {
     // Chiều vào nhận Request, chiều ra trả về Response
     SpecializationResponse createSpecialization(SpecializationRequest request);
 
-    SpecializationResponse updateSpecialization(Long id, SpecializationRequest request);
+    SpecializationResponse updateSpecialization(Integer id, SpecializationRequest request);
 
-    void deleteSpecialization(Long id);
+    void deleteSpecialization(Integer id);
 
     List<SpecializationResponse> getAllSpecializations();
 
-    SpecializationResponse getSpecializationById(Long id);
+    SpecializationResponse getSpecializationById(Integer id);
 }

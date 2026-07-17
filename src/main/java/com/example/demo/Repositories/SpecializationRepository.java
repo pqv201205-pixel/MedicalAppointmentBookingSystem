@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SpecializationRepository extends JpaRepository<Specialization, Long> {
+public interface SpecializationRepository extends JpaRepository<Specialization, Integer> {
     boolean existsByName(String name);
-    boolean existsByNameAndIdNot(String name, Long id); // Dùng cho hàm Update
+    boolean existsByNameAndSpecializationIdNot(String name, Integer specializationId); // Dùng cho hàm Update
 }

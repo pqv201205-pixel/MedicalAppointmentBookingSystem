@@ -2,9 +2,11 @@ package com.example.demo.Services.Impl;
 
 import com.example.demo.DTOs.RequestDTO.*;
 import com.example.demo.DTOs.ResponseDTO.*;
+import com.example.demo.Entities.Patient;
 import com.example.demo.Entities.User;
 import com.example.demo.Enums.Role;
 import com.example.demo.Exceptions.*;
+import com.example.demo.Repositories.PatientRepository;
 import com.example.demo.Repositories.UserRepository;
 import com.example.demo.Security.JwtTokenProvider;
 import com.example.demo.Services.AuditLogService;
@@ -45,7 +47,7 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;       // Tính năng 11
     private final AuditLogService auditLogService;    // Tính năng 16
     private final RedisTokenService redisTokenService;  // Tính năng 18 — cache refresh token
-
+    private final PatientRepository patientRepository;
     // ─────────────────────────────────────────────
     // 1.1 ĐĂNG KÝ
     // ─────────────────────────────────────────────
@@ -66,7 +68,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Email đã được đăng ký: " + request.getEmail());
         }
-
+        Role assignedRole = request.getRole() != null ? request.getRole() : Role.PATIENT;
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -77,6 +79,18 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         User saved = userRepository.save(user);
+        // 3. Nếu role đăng ký là PATIENT, tự động tạo hồ sơ Bệnh nhân (Patient) tương ứng
+        if (assignedRole == Role.PATIENT) {
+            Patient patient = Patient.builder()
+                    .user(saved) // Liên kết khóa ngoại (Foreign Key) sang User vừa tạo
+                    // Lấy tạm Username làm tên hiển thị ban đầu, hoặc map từ request nếu RegisterRequest có trường fullName
+                    .fullName(request.getUsername() != null ? request.getUsername() : saved.getUsername())
+                    .build();
+
+            patientRepository.save(patient); // Nhớ inject private final PatientRepository patientRepository ở trên đầu file nhé
+            log.info("Tự động tạo hồ sơ bệnh nhân thành công cho userId={}", saved.getUserId());
+        }
+        // ============================================================
 
         // Audit log — tính năng 16
         auditLogService.log(saved.getUserId(), "REGISTER", "Tạo tài khoản mới role=" + saved.getRole());

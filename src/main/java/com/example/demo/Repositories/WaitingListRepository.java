@@ -9,5 +9,5 @@ import java.util.List;
 public interface WaitingListRepository extends JpaRepository<WaitingList, Integer> { // Sử dụng Integer cho Khóa chính ID hàng đợi
 
     // Hàm chuẩn Spring Data JPA bóc tách quan hệ: Tìm danh sách chờ theo Mã lịch trình và xếp thứ tự đăng ký trước lên đầu (FIFO)
-    List<WaitingList> findByDoctorSchedule_ScheduleIdOrderByCreatedAtAsc(Integer scheduleId);
+    List<WaitingList> findBySchedule_ScheduleIdOrderByCreatedAtAsc(Integer scheduleId);
 }

@@ -1,0 +1,59 @@
+
+
+ APPOINTMENTCONTROLLER
+ /**
+     * 1. API Đặt lịch khám bệnh
+     * ĐÃ ĐỒNG BỘ: Đổi sang nhận gốc /api/appointments và trả về Object thay vì String chữ
+     */
+    @PostMapping
+    public ResponseEntity<?> bookAppointment(@Valid @RequestBody BookAppointmentRequest request) {
+        log.info("REST request đặt lịch khám cho Patient ID: {}", request.getPatientId());
+        Object result = appointmentService.bookAppointment(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    }
+
+    /**
+     * 2. API Lấy chi tiết lịch hẹn theo ID
+     * ĐÃ ĐỒNG BỘ với: api.get(`/appointments/${id}`)
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        log.info("REST request lấy chi tiết lịch hẹn ID: {}", id);
+        return ResponseEntity.ok(appointmentService.getById(id));
+    }
+
+    /**
+     * 3. API Hủy lịch hẹn khám bệnh
+     * ĐÃ ĐỒNG BỘ: Chuyển sang @PatchMapping tương thích với Front-end
+     */
+    @PatchMapping("/{appointmentId}/cancel")
+    public ResponseEntity<String> cancelAppointment(@PathVariable Integer appointmentId) {
+        log.info("REST request hủy lịch hẹn ID: {}", appointmentId);
+        // Nếu nghiệp vụ cũ cần lý do, bạn có thể truyền chuỗi rỗng hoặc bổ sung RequestBody
+        appointmentService.cancelAppointment(appointmentId, "Người dùng tự hủy trên giao diện");
+        return ResponseEntity.ok("Đã hủy lịch hẹn thành công.");
+    }
+/**
+     * 6. API Bệnh nhân lấy mã QR Check-in lịch hẹn dạng Base64
+     * ĐÃ ĐỒNG BỘ với: api.get(`/appointments/${appointmentId}/qrcode`)
+     */
+    @GetMapping("/{id}/qrcode")
+    public ResponseEntity<?> getAppointmentQrCode(@PathVariable Integer id) {
+        try {
+            String base64Image = qrCodeService.generateAppointmentQrCode(id);
+            Map<String, String> response = new HashMap<>();
+            response.put("qrCodeBase64", "data:image/png;base64," + base64Image);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi tạo mã QR: " + e.getMessage());
+        }
+    }
+
+
+
+
+
+
+
+

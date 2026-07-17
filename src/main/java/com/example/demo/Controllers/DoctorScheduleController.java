@@ -45,4 +45,48 @@ public class DoctorScheduleController {
         List<ScheduleResponse> availableSchedules = scheduleService.getAvailableSchedules(doctorId, date);
         return ResponseEntity.ok(availableSchedules);
     }
+    /**
+     * API Giữ chỗ trước khi đặt lịch (Hoặc để test concurrency)
+     * URL: POST http://localhost:8080/api/schedules/{id}/reserve
+     */
+    @PostMapping("/{id}/reserve")
+    public ResponseEntity<Void> reserveSlot(@PathVariable Integer id) {
+        scheduleService.reserveSlot(id);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * API Nhả chỗ khi hủy lịch (Thường gọi nội bộ, nhưng có thể mở endpoint nếu cần)
+     * URL: POST http://localhost:8080/api/schedules/{id}/release
+     */
+    @PostMapping("/{id}/release")
+    public ResponseEntity<Void> releaseSlot(@PathVariable Integer id) {
+        scheduleService.releaseSlot(id);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * API: Lấy toàn bộ danh sách lịch làm việc của một bác sĩ bất kỳ (Cho Admin quản lý)
+     * URL: GET http://localhost:8080/api/schedules/doctor/{doctorId}
+     */
+    @GetMapping("/doctor/{doctorId}")
+    public ResponseEntity<List<ScheduleResponse>> getSchedulesByDoctorId(@PathVariable Integer doctorId) {
+        log.info("REST request lấy toàn bộ lịch trình của Doctor ID: {}", doctorId);
+        // Giả định tầng service của bạn đã có hàm tìm kiếm toàn bộ lịch theo doctorId
+        List<ScheduleResponse> schedules = scheduleService.getAllSchedulesByDoctorId(doctorId);
+        return ResponseEntity.ok(schedules);
+    }
+
+    /**
+     * API: Bác sĩ tự xem toàn bộ lịch làm việc của chính mình
+     * URL: GET http://localhost:8080/api/schedules/me
+     */
+    @GetMapping("/me")
+    public ResponseEntity<List<ScheduleResponse>> getMySchedules() {
+        Integer mockCurrentUserId = 2; // Sau này thay bằng ID từ JWT Token / Principal
+        log.info("REST request Bác sĩ tự lấy lịch trình của chính mình, User ID: {}", mockCurrentUserId);
+
+        List<ScheduleResponse> mySchedules = scheduleService.getSchedulesByDoctorUserId(mockCurrentUserId);
+        return ResponseEntity.ok(mySchedules);
+    }
 }

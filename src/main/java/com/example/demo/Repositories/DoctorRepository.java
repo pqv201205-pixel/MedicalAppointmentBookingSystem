@@ -11,16 +11,14 @@ import java.util.Optional;
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
 
-    // Tìm hồ sơ bác sĩ bằng UserId đăng nhập
     Optional<Doctor> findByUser_UserId(Integer userId);
 
-    // Tìm danh sách bác sĩ theo tên Chuyên khoa (Hỗ trợ Cache danh sách bác sĩ)
-    List<Doctor> findBySpecialty(String specialty);
+    List<Doctor> findBySpecialization_Name(String name);
 
-    // Tìm kiếm bác sĩ kết hợp lọc chuyên khoa và kinh nghiệm
-    List<Doctor> findBySpecialtyAndExperienceYearsGreaterThanEqual(String specialty, Integer years);
+    List<Doctor> findBySpecialization_NameAndExperienceYearsGreaterThanEqual(
+            String name,
+            Integer years);
 
-    // Thống kê tổng số bác sĩ phục vụ Dashboard Quản trị
     @Query("SELECT COUNT(d) FROM Doctor d")
     long countTotalDoctors();
 }

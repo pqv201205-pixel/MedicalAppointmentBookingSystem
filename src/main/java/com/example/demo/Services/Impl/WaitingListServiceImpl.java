@@ -50,7 +50,7 @@ public class WaitingListServiceImpl {
         log.info("Đang quét danh sách chờ cho lịch khám ID: {}", scheduleId);
 
         // Lấy người xếp hàng đầu tiên (FIFO - First In, First Out)
-        List<WaitingList> waitingPeople = waitingListRepository.findByDoctorSchedule_ScheduleIdOrderByCreatedAtAsc(scheduleId);
+        List<WaitingList> waitingPeople = waitingListRepository.findBySchedule_ScheduleIdOrderByCreatedAtAsc(scheduleId);
 
         if (waitingPeople.isEmpty()) {
             log.info("Không có ai trong danh sách chờ của lịch khám này.");

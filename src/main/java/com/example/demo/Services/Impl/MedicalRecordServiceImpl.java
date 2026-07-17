@@ -7,6 +7,7 @@ import com.example.demo.Enums.AppointmentStatus;
 import com.example.demo.Repositories.MedicalRecordRepository;
 import com.example.demo.Repositories.AppointmentRepository;
 
+import com.example.demo.Services.MedicalRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class MedicalRecordServiceImpl {
+public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     private final MedicalRecordRepository medicalRecordRepository;
     private final AppointmentRepository appointmentRepository;

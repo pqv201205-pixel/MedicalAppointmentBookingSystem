@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SpecializationResponse {
 
-    private Long specializationId; // Mã ID chuyên khoa lấy từ DB, dùng để định danh khi chọn bộ lọc ngoài trang chủ
+    private Integer specializationId; // Mã ID chuyên khoa lấy từ DB, dùng để định danh khi chọn bộ lọc ngoài trang chủ
 
     private String name;           // Tên chuyên khoa
 

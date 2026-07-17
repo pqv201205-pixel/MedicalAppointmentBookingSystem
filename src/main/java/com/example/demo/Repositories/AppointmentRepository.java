@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -49,5 +50,21 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     List<Appointment> findByDoctor_DoctorId(Integer doctorId);
 
     // Tìm tất cả lịch hẹn của một cấu hình khung giờ làm việc
-    List<Appointment> findByDoctorSchedule_ScheduleId(Integer scheduleId);
+//    List<Appointment> findByDoctorSchedule_ScheduleId(Integer scheduleId);
+    List<Appointment> findBySchedule_ScheduleId(Integer scheduleId);
+    List<Appointment> findByPatient_PatientIdAndStatusInOrderByAppointmentDateDesc(
+            Integer patientId,
+            Collection<AppointmentStatus> statuses
+    );
+    List<Appointment> findByPatient_PatientIdAndAppointmentDateGreaterThanEqualAndStatusInOrderByAppointmentDateAsc(
+            Integer patientId,
+            LocalDate date,
+            Collection<AppointmentStatus> statuses
+    );
+
+    List<Appointment> findByDoctor_DoctorIdAndAppointmentDateAndStatusNot(
+            Integer doctorId,
+            LocalDate appointmentDate,
+            AppointmentStatus status
+    );
 }

@@ -33,4 +33,10 @@ public interface AppointmentService {
      * Lấy danh sách lịch hẹn cần khám của một Bác sĩ
      */
     List<AppointmentResponse> getDoctorAppointments(Integer doctorId);
+
+    AppointmentResponse getById(Integer id);
+    List<AppointmentResponse> getAllAppointments();
+
+    List<AppointmentResponse> getUpcomingAppointments(Integer patientId);
+    List<AppointmentResponse> getAppointmentHistory(Integer patientId);
 }

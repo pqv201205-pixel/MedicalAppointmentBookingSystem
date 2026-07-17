@@ -3,7 +3,8 @@ package com.example.demo.DTOs.ResponseDTO;
 import com.example.demo.Entities.Patient;
 import lombok.*;
 import java.time.LocalDate;
-
+@NoArgsConstructor  // <--- THÊM DÒNG NÀY ĐỂ MỞ PUBLIC CONSTRUCTOR RỖNG
+@AllArgsConstructor
 @Data
 @Builder
 public class PatientResponse {
@@ -13,8 +14,7 @@ public class PatientResponse {
     private LocalDate   dateOfBirth;
     private String      address;
     private String      medicalHistory;
-    private UserResponse user;
-
+    private Integer userId;
     public static PatientResponse from(Patient patient) {
         return PatientResponse.builder()
                 .patientId(patient.getPatientId())
@@ -23,7 +23,7 @@ public class PatientResponse {
                 .dateOfBirth(patient.getDateOfBirth())
                 .address(patient.getAddress())
                 .medicalHistory(patient.getMedicalHistory())
-                .user(UserResponse.from(patient.getUser()))
+                .userId(patient.getPatientId())
                 .build();
     }
 }

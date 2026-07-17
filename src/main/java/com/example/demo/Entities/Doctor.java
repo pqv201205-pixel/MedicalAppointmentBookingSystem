@@ -1,5 +1,6 @@
 package com.example.demo.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -17,13 +18,16 @@ public class Doctor {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UserId", nullable = false)
+    @JsonIgnoreProperties({"password_hash", "appointments", "doctor"}) // Bỏ qua các trường nhạy cảm hoặc gây vòng lặp
     private User user;
 
     @Column(name = "FullName", length = 100, nullable = false)
     private String fullName;
 
-    @Column(name = "Specialty", length = 100, nullable = false)
-    private String specialty;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SpecializationId")
+    @JsonIgnoreProperties({"doctors"}) // Ngăn không cho serialize ngược lại danh sách doctor từ specialization
+    private Specialization specialization;
 
     @Column(name = "Degree", length = 50)
     private String degree;

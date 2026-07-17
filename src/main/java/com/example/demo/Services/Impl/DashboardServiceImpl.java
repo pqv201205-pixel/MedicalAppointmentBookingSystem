@@ -4,6 +4,7 @@ import com.example.demo.Enums.AppointmentStatus;
 import com.example.demo.Repositories.AppointmentRepository;
 import com.example.demo.Repositories.DoctorRepository;
 
+import com.example.demo.Services.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class DashboardServiceImpl {
+public class DashboardServiceImpl implements DashboardService {
 
     private final AppointmentRepository appointmentRepository;
     private final DoctorRepository doctorRepository;

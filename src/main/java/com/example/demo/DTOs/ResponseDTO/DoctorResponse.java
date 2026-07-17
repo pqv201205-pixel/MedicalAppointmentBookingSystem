@@ -20,8 +20,9 @@ public class DoctorResponse {
         return DoctorResponse.builder()
                 .doctorId(doctor.getDoctorId())
                 .fullName(doctor.getFullName())
-                .specialty(doctor.getSpecialty())
-                .degree(doctor.getDegree())
+// SỬA DÒNG LỖI ĐỎ THÀNH ĐOẠN NÀY:
+                // Kiểm tra nếu bác sĩ chưa gán chuyên khoa thì tránh bị lỗi NullPointerException
+                .specialty(doctor.getSpecialization() != null ? doctor.getSpecialization().getName() : null)                .degree(doctor.getDegree())
                 .experienceYears(doctor.getExperienceYears())
                 .consultationFee(doctor.getConsultationFee())
                 .biography(doctor.getBiography())

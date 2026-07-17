@@ -12,4 +12,6 @@ public interface ScheduleService {
     List<ScheduleResponse> getAvailableSchedules(Integer doctorId, LocalDate date);
     void reserveSlot(Integer scheduleId); // Hàm giữ chỗ khi đặt lịch (Nơi xử lý Lock)
     void releaseSlot(Integer scheduleId); // Hàm trả lại chỗ khi bệnh nhân hủy lịch
+    List<ScheduleResponse> getAllSchedulesByDoctorId(Integer doctorId);
+    List<ScheduleResponse> getSchedulesByDoctorUserId(Integer userId);
 }

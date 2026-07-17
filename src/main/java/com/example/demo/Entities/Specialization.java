@@ -1,5 +1,6 @@
 package com.example.demo.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -13,7 +14,7 @@ public class Specialization {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SpecializationId")
-    private Long specializationId;
+    private Integer specializationId;
 
     @Column(name = "Name", nullable = false, unique = true)
     private String name; // Ví dụ: Tim mạch, Da liễu...
@@ -23,5 +24,6 @@ public class Specialization {
 
     // Mối quan hệ: Một chuyên khoa có nhiều bác sĩ
     @OneToMany(mappedBy = "specialization", cascade = CascadeType.ALL)
+    @JsonIgnore // Tốt nhất là chặn không cho trả về danh sách bác sĩ khi gọi API Chuyên khoa
     private List<Doctor> doctors;
 }

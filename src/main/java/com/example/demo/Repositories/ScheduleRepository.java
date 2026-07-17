@@ -11,8 +11,12 @@ import java.util.List;
 public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
 
     // Lấy danh sách lịch khám của một bác sĩ dựa theo mã ID
-    List<Schedule> findByDoctorId(Integer doctorId);
+    List<Schedule> findByDoctor_DoctorId(Integer doctorId);
 
-    // Lấy danh sách lịch khám của bác sĩ trong một ngày cụ thể
-    List<Schedule> findByDoctorIdAndDate(Integer doctorId, LocalDate date);
+
+    List<Schedule> findByDoctor_DoctorIdAndDate(Integer doctorId, LocalDate date);
+    List<Schedule> findByDoctor_DoctorIdAndDateAndMaxSlotsGreaterThan(Integer doctorId, LocalDate date, Integer maxSlots);
+
+    // MỚI: Tìm lịch bằng cách đi xuyên qua thuộc tính User liên kết với Doctor
+    List<Schedule> findByDoctor_User_UserId(Integer userId);
 }
